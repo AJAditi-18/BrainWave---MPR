@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* App-wide font and pure black background */
+body {
+  @apply font-sans bg-brainwave-bg text-brainwave-secondary;
+}
+
+/* Modern scrollbars for dark mode */
+::-webkit-scrollbar {
+  width: 8px;
+  background: #0a0c10;
+}
+::-webkit-scrollbar-thumb {
+  background: #a9edf6;
+  border-radius: 4px;
+}
+
+/* --- Brainwave utility color classes --- */
+.text-brainwave-secondary {
+  color: #96eaf5;
+}
+.bg-brainwave-secondary {
+  background-color: #67e8f9;
+}
+.text-brainwave-primary {
+  color: #03252c;
+}
+.bg-brainwave-primary {
+  background-color: #042a3b;
+}
+.text-brainwave-bg {
+  color: #cbdee6;
+}
+.bg-brainwave-bg {
+  background-color: #0a0c10;
+}
+.text-brainwave-accent {
+  color: #22d3ee;
+}
+.bg-brainwave-accent {
+  background-color: #22d3ee;
+}
+
+/* --- Login glass card --- */
+.bg-brainwave-primary-glass {
+  background-color: rgba(3, 31, 74, 0.639); /* 85% teal opacity */
+  box-shadow: 0 4px 28px 0 rgba(43, 123, 184, 0.331);
+  border-radius: 1rem;
+  backdrop-filter: blur(2px);
+}
+
+/* Form labels inside glass containers: cyan */
+.bg-brainwave-primary-glass label {
+  color: #a3d2d8 !important;
+}
+
+/* Input text and placeholders: dark teal */
+.bg-brainwave-primary-glass input,
+.bg-brainwave-primary-glass textarea {
+  color: #022033 !important;
+  background-color: #ffffff;
+}
+
+.bg-brainwave-primary-glass input::placeholder,
+.bg-brainwave-primary-glass textarea::placeholder {
+  color: #02181f;
+  opacity: 0.8;
+}
+
+/* Button in glass card: white text, teal background */
+.bg-brainwave-primary-glass button,
+.bg-brainwave-primary-glass .btn-primary {
+  color: #91cad2;
+  background-color: #02232c;
+}
+
+/* Headings: cyan for h1/h2, accent for h3 */
+h1, h2 {
+  @apply font-extrabold text-brainwave-secondary;
+}
+h3 {
+  @apply font-bold text-brainwave-accent;
+}
