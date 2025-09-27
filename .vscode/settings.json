@@ -1,0 +1,17 @@
+{
+  "css.validate": false,
+  "postcss.validate": false,
+  "tailwindCSS.emmetCompletions": true,
+  "tailwindCSS.includeLanguages": {
+    "html": "html",
+    "javascript": "javascript",
+    "css": "css"
+  },
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+  "editor.inlineSuggest.enabled": true,
+  "files.associations": {
+    "*.css": "tailwindcss"
+  }
+}
