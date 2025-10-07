@@ -111,11 +111,6 @@ vercel --prod
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 👨‍💻 Author
-
-**Your Name**
-- GitHub: [@yourusername](https://github.com/yourusername)
-- Email: your.email@example.com
 
 ## Acknowledgments
 
@@ -126,12 +121,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **⭐ If you like this project, please give it a star on GitHub!**
 
----
 
-Just replace:
-- `yourusername` with your actual GitHub username
-- `Your Name` and contact details
-- Add actual screenshots
-- Update any specific features or configurations unique to your project
-
-This README follows GitHub best practices and will make your project look professional!
