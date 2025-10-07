@@ -117,11 +117,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - GitHub: [@yourusername](https://github.com/yourusername)
 - Email: your.email@example.com
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
-- React team for the amazing framework
-- Tailwind CSS for the utility-first CSS framework
-- Vite for the fast build tool
+-
+
 
 ***
 
