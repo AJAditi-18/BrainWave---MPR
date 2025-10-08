@@ -1,17 +1,20 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
-import Login from "./pages/Login";
+// Import pages
+import Login from "./pages/login";
+import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
-import Marketplace from "./pages/marketplace"; 
+import Marketplace from "./pages/Marketplace";
 import Profile from "./pages/Profile";
 
+// Import Auth context
 import { AuthProvider, useAuth } from "./context/AuthContext";
 
-// Protected route wrapper to only allow logged-in users
+// Protected route wrapper
 const PrivateRoute = ({ children }) => {
   const { user } = useAuth();
-  return user ? children : <Navigate to="/login" />;
+  return user ? children : <Navigate to="/signup" />;
 };
 
 function App() {
@@ -19,11 +22,14 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          {/* Redirect root to dashboard */}
-          <Route path="/" element={<Navigate to="/dashboard" />} />
-          {/* Login page always available */}
+          {/* Redirect root to signup */}
+          <Route path="/" element={<Navigate to="/signup" />} />
+          
+          {/* Public routes */}
+          <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
-          {/* Protected pages */}
+          
+          {/* Protected routes */}
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/marketplace" element={<PrivateRoute><Marketplace /></PrivateRoute>} />
           <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
