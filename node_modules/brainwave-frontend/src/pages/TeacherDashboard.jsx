@@ -6,6 +6,7 @@ import NotesPanel from "./Panels/NotesPanel";
 import RemindersPanel from "./Panels/RemindersPanel";
 import SettingsPanel from "./Panels/SettingsPanel";
 import StudentsPanel from "./Panels/StudentsPanel";
+import TimetableEditor from "./Panels/TimetableEditor";
 import {
   BookOpenIcon, DocumentTextIcon, BellIcon, UserGroupIcon, HomeIcon,
   CalendarIcon, ClipboardDocumentCheckIcon, Cog6ToothIcon, ArrowRightOnRectangleIcon
@@ -47,6 +48,7 @@ function getLastNDates(n) {
 }
 
 const attendanceDates = getLastNDates(30);
+
 const teacherProfile = {
   name: "Prof. Demo Teacher",
   email: "teacher@test.com",
@@ -56,7 +58,7 @@ const teacherProfile = {
   subjects: ["Data Structures", "Software Engineering", "Database Management"],
 };
 
-const timetable = [
+const initialTimetable = [
   {
     day: "Monday",
     slots: [
@@ -124,6 +126,10 @@ export default function TeacherDashboard() {
   const [editProfile, setEditProfile] = useState(false);
   const [profileDraft, setProfileDraft] = useState({ ...teacherProfile });
 
+  // Timetable
+  const [timetable, setTimetable] = useState(initialTimetable);
+  const [showTimetableEditor, setShowTimetableEditor] = useState(false);
+
   // Students
   const [studentAssignments, setStudentAssignments] = useState({});
   const [studentMarks, setStudentMarks] = useState({});
@@ -187,6 +193,7 @@ export default function TeacherDashboard() {
 
         {activeTab === "overview" && <OverviewPanel isDark={isDark} teacherProfile={profileDraft} timetable={timetable}
           totalAssignments={totalAssignments} totalNotes={totalNotes} totalStudents={totalStudents}
+          onEditTimetable={() => setShowTimetableEditor(true)}
         />}
         {activeTab === "attendance" && <AttendancePanel {...{
           isDark, classMap, attendance, setAttendance, selectedClassKey, setSelectedClassKey,
@@ -213,6 +220,15 @@ export default function TeacherDashboard() {
           editProfile, setEditProfile, handleLogout
         }} />}
       </main>
+
+      {/* Timetable Editor Modal */}
+      <TimetableEditor
+        isDark={isDark}
+        timetable={timetable}
+        setTimetable={setTimetable}
+        open={showTimetableEditor}
+        setOpen={setShowTimetableEditor}
+      />
     </div>
   );
 }

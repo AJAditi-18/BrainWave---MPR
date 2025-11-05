@@ -1,7 +1,7 @@
 import React from "react";
-import { UserGroupIcon, CalendarIcon, DocumentTextIcon, BookOpenIcon } from "@heroicons/react/24/outline";
+import { UserGroupIcon, CalendarIcon, DocumentTextIcon, BookOpenIcon, PencilIcon } from "@heroicons/react/24/outline";
 
-export default function OverviewPanel({ isDark, teacherProfile, timetable, totalAssignments, totalNotes, totalStudents }) {
+export default function OverviewPanel({ isDark, teacherProfile, timetable, totalAssignments, totalNotes, totalStudents, onEditTimetable }) {
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -79,10 +79,20 @@ export default function OverviewPanel({ isDark, teacherProfile, timetable, total
 
         {/* Timetable */}
         <div className={`${isDark ? "bg-gray-800" : "bg-white"} p-6 rounded-xl shadow`}>
-          <h3 className={`font-bold text-lg mb-4 flex items-center gap-2 ${isDark ? "text-cyan-400" : "text-cyan-700"}`}>
-            <CalendarIcon className="h-6 w-6" />
-            Weekly Timetable
-          </h3>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className={`font-bold text-lg flex items-center gap-2 ${isDark ? "text-cyan-400" : "text-cyan-700"}`}>
+              <CalendarIcon className="h-6 w-6" />
+              Weekly Timetable
+            </h3>
+            <button
+              onClick={onEditTimetable}
+              className={`flex items-center gap-1 px-3 py-1 text-sm font-semibold rounded transition ${
+                isDark ? "bg-cyan-900 text-cyan-200 hover:bg-cyan-800" : "bg-cyan-600 text-white hover:bg-cyan-700"
+              }`}
+            >
+              <PencilIcon className="h-4 w-4" /> Edit
+            </button>
+          </div>
           <div className="space-y-3 max-h-96 overflow-y-auto">
             {timetable.map((day, idx) => (
               <div key={idx} className={`border-l-4 border-cyan-400 pl-3 py-2 ${isDark ? "border-cyan-600" : ""}`}>
