@@ -1,83 +1,52 @@
-/*import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Login from "./pages/login";
-import Signup from "./pages/Signup";
-import Dashboard from "./pages/dashboard";
-import TeacherDashboard from "./pages/TeacherDashboard";
-import { AuthProvider, useAuth } from "./context/AuthContext";
-
-// Protected route
-const PrivateRoute = ({ children, allowedRoles }) => {
-  const { user } = useAuth();
-  if (!user) return <Navigate to="/login" />;
-  if (allowedRoles && !allowedRoles.includes(user.role)) return <Navigate to="/unauthorized" />;
-  return children;
-};
-
-function App() {
-  return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Navigate to="/login" />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route
-            path="/dashboard"
-            element={
-              <PrivateRoute allowedRoles={["student"]}>
-                <Dashboard />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/teacher-dashboard"
-            element={
-              <PrivateRoute allowedRoles={["teacher"]}>
-                <TeacherDashboard />
-              </PrivateRoute>
-            }
-          />
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
-  );
-}
-
-export default App;
-*/
 import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/login";
 import Signup from "./pages/Signup";
-import Dashboard from "./pages/Dashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
+import StudentDashboard from "./pages/StudentDashboard";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 
 // Protected route wrapper
 const PrivateRoute = ({ children, allowedRole }) => {
   const { user } = useAuth();
-  if (!user) return <Navigate to="/login" />;
-  if (allowedRole && user.role !== allowedRole) return <Navigate to="/login" />;
+
+  console.log("PrivateRoute - user:", user); // Debug log
+  console.log("PrivateRoute - allowedRole:", allowedRole); // Debug log
+
+  if (!user) {
+    console.log("No user found, redirecting to login");
+    return <Navigate to="/login" />;
+  }
+
+  if (allowedRole && user.role !== allowedRole) {
+    console.log(`Role mismatch: user role is ${user.role}, required role is ${allowedRole}`);
+    return <Navigate to="/login" />;
+  }
+
+  console.log("Access granted!");
   return children;
 };
 
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
+      <Router>
         <Routes>
-          <Route path="/" element={<Navigate to="/login" />} />
+          {/* Public Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+
+          {/* Student Dashboard Route */}
           <Route
             path="/dashboard"
             element={
               <PrivateRoute allowedRole="student">
-                <Dashboard />
+                <StudentDashboard />
               </PrivateRoute>
             }
           />
+
+          {/* Teacher Dashboard Route */}
           <Route
             path="/teacher-dashboard"
             element={
@@ -86,8 +55,11 @@ function App() {
               </PrivateRoute>
             }
           />
+
+          {/* Fallback route */}
+          <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
-      </BrowserRouter>
+      </Router>
     </AuthProvider>
   );
 }

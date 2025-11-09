@@ -6,10 +6,20 @@ import NotesPanel from "./Panels/NotesPanel";
 import RemindersPanel from "./Panels/RemindersPanel";
 import SettingsPanel from "./Panels/SettingsPanel";
 import StudentsPanel from "./Panels/StudentsPanel";
-import TimetableEditor from "./Panels/TimetableEditor";
+import AssistantPanel from "./Panels/AssistantPanel";
 import {
-  BookOpenIcon, DocumentTextIcon, BellIcon, UserGroupIcon, HomeIcon,
-  CalendarIcon, ClipboardDocumentCheckIcon, Cog6ToothIcon, ArrowRightOnRectangleIcon
+  BookOpenIcon,
+  DocumentTextIcon,
+  BellIcon,
+  UserGroupIcon,
+  HomeIcon,
+  CalendarIcon,
+  ClipboardDocumentCheckIcon,
+  Cog6ToothIcon,
+  ArrowRightOnRectangleIcon,
+  ChatBubbleLeftRightIcon,
+  SunIcon,
+  MoonIcon,
 } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router-dom";
 
@@ -48,7 +58,6 @@ function getLastNDates(n) {
 }
 
 const attendanceDates = getLastNDates(30);
-
 const teacherProfile = {
   name: "Prof. Demo Teacher",
   email: "teacher@test.com",
@@ -58,7 +67,7 @@ const teacherProfile = {
   subjects: ["Data Structures", "Software Engineering", "Database Management"],
 };
 
-const initialTimetable = [
+const timetable = [
   {
     day: "Monday",
     slots: [
@@ -70,21 +79,6 @@ const initialTimetable = [
     day: "Tuesday",
     slots: [{ time: "10:00-11:00", subject: "DBMS", class: "MCA-A" }],
   },
-  {
-    day: "Wednesday",
-    slots: [{ time: "9:00-10:00", subject: "Software Engg.", class: "BCA-B" }],
-  },
-  {
-    day: "Thursday",
-    slots: [
-      { time: "11:00-12:00", subject: "DBMS", class: "MCA-B" },
-      { time: "3:00-4:00", subject: "Data Structures", class: "CS-A" },
-    ],
-  },
-  {
-    day: "Friday",
-    slots: [{ time: "12:00-1:00", subject: "Software Engg.", class: "BCA-B" }],
-  },
 ];
 
 const classSubjectOptions = classMap.map((cls) => ({
@@ -94,141 +88,222 @@ const classSubjectOptions = classMap.map((cls) => ({
 }));
 
 export default function TeacherDashboard() {
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
   const navigate = useNavigate();
 
-  // Shared state
+  // State management
   const [activeTab, setActiveTab] = useState("overview");
   const [isDark, setIsDark] = useState(false);
-
-  // Attendance
   const [selectedClassKey, setSelectedClassKey] = useState(classMap[0].classKey);
   const [attendance, setAttendance] = useState({});
   const [noClassDates, setNoClassDates] = useState({});
-
-  // Assignments
   const [assignmentsByClass, setAssignmentsByClass] = useState({});
   const [assignmentFormClass, setAssignmentFormClass] = useState(classSubjectOptions[0].classKey);
   const [newAssignment, setNewAssignment] = useState({ name: "", due: "" });
-
-  // Notes
   const [notesByClass, setNotesByClass] = useState({});
   const [notesFormClass, setNotesFormClass] = useState(classSubjectOptions[0].classKey);
   const [newNote, setNewNote] = useState({ title: "" });
-
-  // Reminders
-  const [reminders, setReminders] = useState([{ id: 1, title: "Faculty meeting tomorrow at 10 AM", date: "2025-11-08" }]);
+  const [reminders, setReminders] = useState([
+    { id: 1, title: "Faculty meeting tomorrow at 10 AM", date: "2025-11-08" },
+  ]);
   const [newReminder, setNewReminder] = useState({ title: "", date: "" });
   const [editingReminder, setEditingReminder] = useState(null);
   const [editDraft, setEditDraft] = useState({});
-
-  // Settings
   const [editProfile, setEditProfile] = useState(false);
   const [profileDraft, setProfileDraft] = useState({ ...teacherProfile });
-
-  // Timetable
-  const [timetable, setTimetable] = useState(initialTimetable);
-  const [showTimetableEditor, setShowTimetableEditor] = useState(false);
-
-  // Students
   const [studentAssignments, setStudentAssignments] = useState({});
   const [studentMarks, setStudentMarks] = useState({});
 
   // Calculated values
-  const totalAssignments = useMemo(() => Object.values(assignmentsByClass).reduce((sum, arr) => sum + (arr ? arr.length : 0), 0), [assignmentsByClass]);
-  const totalNotes = useMemo(() => Object.values(notesByClass).reduce((sum, arr) => sum + (arr ? arr.length : 0), 0), [notesByClass]);
+  const totalAssignments = useMemo(
+    () => Object.values(assignmentsByClass).reduce((sum, arr) => sum + (arr ? arr.length : 0), 0),
+    [assignmentsByClass]
+  );
+  const totalNotes = useMemo(
+    () => Object.values(notesByClass).reduce((sum, arr) => sum + (arr ? arr.length : 0), 0),
+    [notesByClass]
+  );
   const totalStudents = useMemo(() => classMap.reduce((sum, cls) => sum + cls.students.length, 0), []);
 
   const navItems = [
-    { id: "overview", icon: <HomeIcon className="h-6 w-6" />, text: "Overview" },
-    { id: "attendance", icon: <ClipboardDocumentCheckIcon className="h-6 w-6" />, text: "Attendance" },
-    { id: "assignments", icon: <DocumentTextIcon className="h-6 w-6" />, text: "Assignments" },
-    { id: "notes", icon: <BookOpenIcon className="h-6 w-6" />, text: "Notes" },
-    { id: "reminders", icon: <BellIcon className="h-6 w-6" />, text: "Reminders" },
-    { id: "students", icon: <UserGroupIcon className="h-6 w-6" />, text: "Students" },
-    { id: "settings", icon: <Cog6ToothIcon className="h-6 w-6" />, text: "Settings" }
+    { id: "overview", icon: HomeIcon, label: "Overview" },
+    { id: "attendance", icon: CalendarIcon, label: "Attendance" },
+    { id: "assignments", icon: ClipboardDocumentCheckIcon, label: "Assignments" },
+    { id: "notes", icon: BookOpenIcon, label: "Notes" },
+    { id: "reminders", icon: BellIcon, label: "Reminders" },
+    { id: "students", icon: UserGroupIcon, label: "Students" },
+    { id: "assistant", icon: ChatBubbleLeftRightIcon, label: "Assistant" },
+    { id: "settings", icon: Cog6ToothIcon, label: "Settings" },
   ];
 
-  const handleLogout = () => { localStorage.clear(); navigate("/login"); };
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/login");
+  };
+
+  const renderPanel = () => {
+    switch (activeTab) {
+      case "overview":
+        return (
+          <OverviewPanel
+            isDark={isDark}
+            teacherProfile={teacherProfile}
+            timetable={timetable}
+            totalAssignments={totalAssignments}
+            totalNotes={totalNotes}
+            totalStudents={totalStudents}
+          />
+        );
+      case "attendance":
+        return (
+          <AttendancePanel
+            isDark={isDark}
+            classMap={classMap}
+            selectedClassKey={selectedClassKey}
+            setSelectedClassKey={setSelectedClassKey}
+            attendance={attendance}
+            setAttendance={setAttendance}
+            noClassDates={noClassDates}
+            setNoClassDates={setNoClassDates}
+            attendanceDates={attendanceDates}
+          />
+        );
+      case "assignments":
+        return (
+          <AssignmentsPanel
+            isDark={isDark}
+            classSubjectOptions={classSubjectOptions}
+            assignmentFormClass={assignmentFormClass}
+            setAssignmentFormClass={setAssignmentFormClass}
+            newAssignment={newAssignment}
+            setNewAssignment={setNewAssignment}
+            assignmentsByClass={assignmentsByClass}
+            setAssignmentsByClass={setAssignmentsByClass}
+          />
+        );
+      case "notes":
+        return (
+          <NotesPanel
+            isDark={isDark}
+            classSubjectOptions={classSubjectOptions}
+            notesFormClass={notesFormClass}
+            setNotesFormClass={setNotesFormClass}
+            newNote={newNote}
+            setNewNote={setNewNote}
+            notesByClass={notesByClass}
+            setNotesByClass={setNotesByClass}
+          />
+        );
+      case "reminders":
+        return (
+          <RemindersPanel
+            isDark={isDark}
+            reminders={reminders}
+            setReminders={setReminders}
+            newReminder={newReminder}
+            setNewReminder={setNewReminder}
+            editingReminder={editingReminder}
+            setEditingReminder={setEditingReminder}
+            editDraft={editDraft}
+            setEditDraft={setEditDraft}
+          />
+        );
+case "students":
+  return (
+    <StudentsPanel
+      isDark={isDark}
+      classMap={classMap}
+      assignmentsByClass={assignmentsByClass}
+      studentAssignments={studentAssignments}
+      setStudentAssignments={setStudentAssignments}
+      studentMarks={studentMarks}
+      setStudentMarks={setStudentMarks}
+      attendance={attendance}
+      attendanceDates={attendanceDates}
+    />
+  );
+
+
+      case "assistant":
+        return <AssistantPanel isDark={isDark} />;
+      case "settings":
+        return (
+          <SettingsPanel
+            isDark={isDark}
+            teacherProfile={teacherProfile}
+            editProfile={editProfile}
+            setEditProfile={setEditProfile}
+            profileDraft={profileDraft}
+            setProfileDraft={setProfileDraft}
+          />
+        );
+      default:
+        return (
+          <OverviewPanel
+            isDark={isDark}
+            teacherProfile={teacherProfile}
+            timetable={timetable}
+            totalAssignments={totalAssignments}
+            totalNotes={totalNotes}
+            totalStudents={totalStudents}
+          />
+        );
+    }
+  };
 
   return (
-    <div className={`min-h-screen flex ${isDark ? "bg-gray-900 text-white" : "bg-gradient-to-br from-[#edf7fa] to-[#e0f2fe] text-gray-900"}`}>
-      <aside className={`${isDark ? "bg-gray-800" : "bg-white"} shadow-lg w-64 p-6 flex flex-col gap-6 sticky top-0 h-screen`}>
-        <div className="font-black tracking-tight text-cyan-600 text-xl mb-6 flex items-center gap-2">
-          🎓 BrainWave
+    <div className={`flex h-screen ${isDark ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"}`}>
+      {/* Sidebar */}
+      <aside className={`w-64 ${isDark ? "bg-gray-800" : "bg-white"} shadow-lg flex flex-col`}>
+        {/* Logo */}
+        <div className="p-6 border-b">
+          <h1 className="text-2xl font-bold text-blue-600">Brainwave</h1>
+          <p className="text-sm text-gray-500">Teacher Portal</p>
         </div>
-        <nav className="flex flex-col gap-2">
-          {navItems.map(item => (
-            <button key={item.id} onClick={() => setActiveTab(item.id)}
-              className={`flex items-center gap-3 px-3 py-2 rounded-lg transition font-medium ${
-                activeTab === item.id ?
-                  (isDark ? "bg-cyan-900 text-cyan-100" : "bg-cyan-50 text-cyan-900") :
-                  (isDark ? "text-gray-300 hover:bg-gray-700" : "text-gray-700 hover:bg-cyan-100")}`}>
-              {item.icon}{item.text}
+
+        {/* Navigation */}
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+          {navItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition ${
+                activeTab === item.id
+                  ? "bg-blue-600 text-white"
+                  : isDark
+                  ? "text-gray-300 hover:bg-gray-700"
+                  : "text-gray-700 hover:bg-gray-100"
+              }`}
+            >
+              <item.icon className="h-5 w-5" />
+              <span>{item.label}</span>
             </button>
           ))}
         </nav>
-        <div className="mt-auto">
-          <div className="flex items-center gap-3 mb-4">
-            <div className={`w-10 h-10 ${isDark ? "bg-cyan-900" : "bg-cyan-100"} rounded-full flex items-center justify-center font-bold text-cyan-700`}>
-              {user?.fullName?.[0] || "T"}
-            </div>
-            <div>
-              <div className={`font-bold ${isDark ? "text-cyan-400" : "text-cyan-700"}`}>
-                {user?.fullName || teacherProfile.name.split(" ")[0]}
-              </div>
-              <div className={`text-xs ${isDark ? "text-gray-400" : "text-gray-400"}`}>Teacher</div>
-            </div>
-          </div>
-          <button onClick={handleLogout} className="flex items-center gap-2 text-red-600 hover:text-red-700 font-medium">
-            <ArrowRightOnRectangleIcon className="h-5 w-5" />Logout
+
+        {/* Dark Mode Toggle & Logout */}
+        <div className={`p-4 border-t ${isDark ? "border-gray-700" : "border-gray-200"} flex items-center justify-center gap-3`}>
+          <button
+            onClick={() => setIsDark(!isDark)}
+            className={`p-2 rounded-lg transition ${
+              isDark ? "bg-gray-700 text-yellow-400 hover:bg-gray-600" : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            }`}
+            title={isDark ? "Light Mode" : "Dark Mode"}
+          >
+            {isDark ? <SunIcon className="h-5 w-5" /> : <MoonIcon className="h-5 w-5" />}
+          </button>
+
+          <button
+            onClick={handleLogout}
+            className="p-2 rounded-lg text-red-500 hover:bg-red-50 transition"
+            title="Logout"
+          >
+            <ArrowRightOnRectangleIcon className="h-5 w-5" />
           </button>
         </div>
       </aside>
 
-      <main className={`flex-1 px-10 py-8 overflow-y-auto ${isDark ? "bg-gray-900" : ""}`}>
-        <h1 className={`text-3xl font-bold mb-6 ${isDark ? "text-cyan-400" : "text-cyan-700"}`}>
-          {navItems.find((item) => item.id === activeTab)?.text}
-        </h1>
-
-        {activeTab === "overview" && <OverviewPanel isDark={isDark} teacherProfile={profileDraft} timetable={timetable}
-          totalAssignments={totalAssignments} totalNotes={totalNotes} totalStudents={totalStudents}
-          onEditTimetable={() => setShowTimetableEditor(true)}
-        />}
-        {activeTab === "attendance" && <AttendancePanel {...{
-          isDark, classMap, attendance, setAttendance, selectedClassKey, setSelectedClassKey,
-          noClassDates, setNoClassDates, attendanceDates
-        }} />}
-        {activeTab === "assignments" && <AssignmentsPanel {...{
-          isDark, classSubjectOptions, assignmentsByClass, setAssignmentsByClass,
-          assignmentFormClass, setAssignmentFormClass, newAssignment, setNewAssignment
-        }} />}
-        {activeTab === "notes" && <NotesPanel {...{
-          isDark, classSubjectOptions, notesByClass, setNotesByClass,
-          notesFormClass, setNotesFormClass, newNote, setNewNote
-        }} />}
-        {activeTab === "reminders" && <RemindersPanel {...{
-          isDark, reminders, setReminders, newReminder, setNewReminder,
-          editingReminder, setEditingReminder, editDraft, setEditDraft
-        }} />}
-        {activeTab === "students" && <StudentsPanel {...{
-          isDark, classMap, assignmentsByClass, studentAssignments, setStudentAssignments,
-          studentMarks, setStudentMarks, attendance, attendanceDates
-        }} />}
-        {activeTab === "settings" && <SettingsPanel {...{
-          isDark, setIsDark, profileDraft, setProfileDraft,
-          editProfile, setEditProfile, handleLogout
-        }} />}
-      </main>
-
-      {/* Timetable Editor Modal */}
-      <TimetableEditor
-        isDark={isDark}
-        timetable={timetable}
-        setTimetable={setTimetable}
-        open={showTimetableEditor}
-        setOpen={setShowTimetableEditor}
-      />
+      {/* Main Content Area */}
+      <main className="flex-1 p-8 overflow-y-auto">{renderPanel()}</main>
     </div>
   );
 }
