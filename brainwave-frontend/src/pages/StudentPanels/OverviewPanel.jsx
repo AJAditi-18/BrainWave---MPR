@@ -6,7 +6,7 @@ export default function OverviewPanel({ isDark }) {
     { label: "Current GPA", value: "3.85", icon: TrophyIcon, color: "text-yellow-600" },
     { label: "Attendance", value: "92%", icon: CalendarIcon, color: "text-green-600" },
     { label: "Assignments Pending", value: "3", icon: ClipboardIcon, color: "text-red-600" },
-    { label: "Courses Enrolled", value: "5", icon: BookOpenIcon, color: "text-blue-600" },
+    { label: "Books borrowed", value: "5", icon: BookOpenIcon, color: "text-blue-600" },
   ];
 
   const upcomingDeadlines = [

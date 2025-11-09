@@ -1,15 +1,14 @@
 import React, { useState } from "react";
-import { 
-  BookOpenIcon, 
-  MagnifyingGlassIcon, 
+import {
+  BookOpenIcon,
+  MagnifyingGlassIcon,
   ArrowDownTrayIcon,
-  CheckCircleIcon, 
-  ExclamationTriangleIcon 
+  CheckCircleIcon,
 } from "@heroicons/react/24/outline";
 
 export default function LibraryPanel({ isDark }) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeTab, setActiveTab] = useState("borrowed"); // 'borrowed', 'returned', 'available'
+  const [activeTab, setActiveTab] = useState("borrowed"); // 'borrowed', 'returned', 'digital-library'
 
   // All books in library
   const allBooks = [
@@ -91,6 +90,10 @@ export default function LibraryPanel({ isDark }) {
       book.author.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleDownload = (book) => {
+    alert(`✅ Downloading: ${book.title}\nAuthor: ${book.author}`);
+  };
+
   return (
     <div className={`${isDark ? "text-white" : "text-gray-900"}`}>
       <h1 className="text-3xl font-bold mb-6">📚 Library</h1>
@@ -138,14 +141,14 @@ export default function LibraryPanel({ isDark }) {
           ✅ Returned Books ({returnedCount})
         </button>
         <button
-          onClick={() => setActiveTab("available")}
+          onClick={() => setActiveTab("digital-library")}
           className={`px-4 py-2 font-semibold border-b-2 transition ${
-            activeTab === "available"
+            activeTab === "digital-library"
               ? "border-purple-600 text-purple-600"
               : `border-transparent ${isDark ? "text-gray-400" : "text-gray-600"} hover:text-purple-600`
           }`}
         >
-          🔍 Browse Library
+          💾 Digital Library
         </button>
       </div>
 
@@ -250,8 +253,8 @@ export default function LibraryPanel({ isDark }) {
         </div>
       )}
 
-      {/* Browse Available Books */}
-      {activeTab === "available" && (
+      {/* Digital Library - Browse Books with Download */}
+      {activeTab === "digital-library" && (
         <div>
           {/* Search Bar */}
           <div className="mb-6">
@@ -304,6 +307,7 @@ export default function LibraryPanel({ isDark }) {
                   {book.year} • {book.category}
                 </p>
                 <button
+                  onClick={() => handleDownload(book)}
                   className={`mt-4 w-full px-3 py-2 rounded-lg font-semibold transition flex items-center justify-center gap-2 ${
                     book.status === "available"
                       ? "bg-blue-600 text-white hover:bg-blue-700"
@@ -312,7 +316,7 @@ export default function LibraryPanel({ isDark }) {
                   disabled={book.status !== "available"}
                 >
                   <ArrowDownTrayIcon className="h-4 w-4" />
-                  {book.status === "available" ? "Borrow Now" : "Not Available"}
+                  {book.status === "available" ? "Download" : "Unavailable"}
                 </button>
               </div>
             ))}
