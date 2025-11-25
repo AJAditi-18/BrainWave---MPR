@@ -1,65 +1,55 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import Login from "./pages/login";
-import Signup from "./pages/Signup";
-import TeacherDashboard from "./pages/TeacherDashboard";
-import StudentDashboard from "./pages/StudentDashboard";
-import { AuthProvider, useAuth } from "./context/AuthContext";
+import React, { useState } from 'react';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import Login from './components/login';
+import Signup from './components/Signup';
+import TeacherDashboard from './components/TeacherDashboard/index';
+import StudentDashboard from './components/StudentDashboard/index';
 
-// Protected route wrapper
-const PrivateRoute = ({ children, allowedRole }) => {
-  const { user } = useAuth();
+function AppContent() {
+  const { user, loading } = useAuth();
+  const [showSignup, setShowSignup] = useState(false);
 
-  console.log("PrivateRoute - user:", user); // Debug log
-  console.log("PrivateRoute - allowedRole:", allowedRole); // Debug log
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+          <p className="mt-4 text-xl text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!user) {
-    console.log("No user found, redirecting to login");
-    return <Navigate to="/login" />;
+    return showSignup ? (
+      <Signup onSwitchToLogin={() => setShowSignup(false)} />
+    ) : (
+      <Login onSwitchToSignup={() => setShowSignup(true)} />
+    );
   }
 
-  if (allowedRole && user.role !== allowedRole) {
-    console.log(`Role mismatch: user role is ${user.role}, required role is ${allowedRole}`);
-    return <Navigate to="/login" />;
+  if (user.role === 'teacher') {
+    return <TeacherDashboard />;
   }
 
-  console.log("Access granted!");
-  return children;
-};
+  if (user.role === 'student') {
+    return <StudentDashboard />;
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-center">
+        <h1 className="text-2xl font-bold text-gray-800">Unknown Role</h1>
+        <p className="text-gray-600 mt-2">Please contact support</p>
+      </div>
+    </div>
+  );
+}
 
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-
-          {/* Student Dashboard Route */}
-          <Route
-            path="/dashboard"
-            element={
-              <PrivateRoute allowedRole="student">
-                <StudentDashboard />
-              </PrivateRoute>
-            }
-          />
-
-          {/* Teacher Dashboard Route */}
-          <Route
-            path="/teacher-dashboard"
-            element={
-              <PrivateRoute allowedRole="teacher">
-                <TeacherDashboard />
-              </PrivateRoute>
-            }
-          />
-
-          {/* Fallback route */}
-          <Route path="*" element={<Navigate to="/login" />} />
-        </Routes>
-      </Router>
+      <AppContent />
     </AuthProvider>
   );
 }

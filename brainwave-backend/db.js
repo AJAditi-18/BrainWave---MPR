@@ -1,26 +1,25 @@
-const mysql = require('mysql2/promise');
+// db.js
+const { Client } = require('pg');
 require('dotenv').config();
 
-const db = mysql.createPool({
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASS || '',
-  database: process.env.DB_NAME || 'brainwave',
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
+const client = new Client({
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT || 5432,
+  database: process.env.DB_NAME,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  ssl: { rejectUnauthorized: false }// ✅ changed here only
 });
 
-// Test connection on startup
-(async () => {
+async function main() {
   try {
-    const connection = await db.getConnection();
-    console.log('✅ MySQL Connected Successfully');
-    connection.release();
-  } catch (error) {
-    console.error('❌ MySQL Connection Failed:', error.message);
-    console.error('💡 Make sure MySQL is running and database "brainwave" exists');
+    await client.connect();
+    console.log("✅ Connected to the PostgreSQL database successfully!");
+  } catch (err) {
+    console.error("❌ Database connection error:", err);
   }
-})();
+}
 
-module.exports = db;
+main();
+
+module.exports = client;
