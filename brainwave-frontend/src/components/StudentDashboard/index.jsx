@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 
 import DashboardPanel from './DashboardPanel';
-import MyCoursesPanel from './MyCoursesPanel';
+import CourseworkPanel from './CourseworkPanel';
 import AIAssistantPanel from './AIAssistantPanel';
 import LibraryPanel from './LibraryPanel';
 import CalendarPanel from './CalendarPanel';
 import LeaderboardPanel from './LeaderboardPanel';
 import AlumniConnectPanel from './AlumniConnectPanel';
 import SettingsPanel from './SettingsPanel';
+import brainwaveLogo from '../../assets/Logo Brainwave.jpg';
 
 const StudentDashboard = () => {
   const { user, logout } = useAuth();
@@ -41,9 +42,16 @@ const StudentDashboard = () => {
       {/* Sidebar */}
       <aside className="w-64 bg-gray-900 dark:bg-gray-950 text-white flex flex-col border-r border-gray-800 dark:border-gray-700">
         <div className="p-6 border-b border-gray-700 dark:border-gray-800">
+          <div className="flex items-center gap-3">
+          <img 
+                        src={brainwaveLogo} 
+                        alt="Brainwave" 
+                        className="w-10 h-10 rounded-lg object-cover shadow-md"
+                      />
           <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">
             Brainwave
           </h1>
+          </div>
           <p className="text-sm text-gray-400 mt-1">Student Portal</p>
         </div>
 
@@ -80,7 +88,7 @@ const StudentDashboard = () => {
       {/* Main Content */}
       <main className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900">
         {activePanel === 'dashboard' && <DashboardPanel data={studentData} />}
-        {activePanel === 'courses' && <MyCoursesPanel data={studentData} />}
+        {activePanel === 'courses' && <CourseworkPanel data={studentData} />}
         {activePanel === 'ai' && <AIAssistantPanel />}
         {activePanel === 'library' && <LibraryPanel data={studentData} />}
         {activePanel === 'calendar' && <CalendarPanel data={studentData} />}

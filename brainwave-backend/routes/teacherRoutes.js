@@ -155,10 +155,19 @@ router.post("/assignments", async (req, res) => {
 
   try {
     await db.query(
-      `INSERT INTO assignments
-       (teacher_id, class_id, title, description, due_date, file_url, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, NOW())`,
-      [teacherId, classId, title, description || "", dueDate || null, fileUrl || null]
+      `
+      INSERT INTO assignments
+      (teacher_id, class_id, title, description, due_date, file_url, created_at)
+      VALUES ($1, $2, $3, $4, $5, $6, NOW())
+      `,
+      [
+        teacherId,
+        classId,
+        title,
+        description || "",
+        dueDate || null,
+        fileUrl || null
+      ]
     );
 
     res.json({ message: "Assignment created" });
@@ -173,7 +182,7 @@ router.get("/assignments/:classId", async (req, res) => {
 
   try {
     const [rows] = await db.query(
-      "SELECT * FROM assignments WHERE class_id = ? ORDER BY created_at DESC",
+      `SELECT * FROM assignments WHERE class_id = ? ORDER BY created_at DESC`,
       [classId]
     );
 

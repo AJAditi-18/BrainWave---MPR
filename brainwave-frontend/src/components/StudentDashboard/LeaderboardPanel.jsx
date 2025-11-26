@@ -59,7 +59,7 @@ const LeaderboardPanel = ({ data }) => {
     const sampleNames = [
       'Rahul Sharma', 'Priya Singh', 'Amit Kumar', 'Neha Gupta', 'Vikram Patel',
       'Anjali Verma', 'Rohan Mehta', 'Sneha Reddy', 'Arjun Kapoor', 'Kavya Iyer',
-      data.name // Include current user
+      data.name
     ];
 
     return sampleNames.slice(0, 20).map((name, index) => ({
@@ -230,7 +230,7 @@ const LeaderboardPanel = ({ data }) => {
               ) : (
                 <tr>
                   <td colSpan="4" className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
-                    {searchTerm ? 'No results found' : 'No leaderboard data available'}
+                    {searchTerm ? 'No results found' : 'No leaderboard data available as of now. Results will be updated soon.'}
                   </td>
                 </tr>
               )}

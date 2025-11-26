@@ -1,3 +1,6 @@
+// 🔥 TEMP in-memory assignment store
+global.__ASSIGNMENTS__ = {};
+
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
@@ -12,9 +15,26 @@ app.use(express.json());
 // Database connection
 const db = require('./db');
 
+// ✅ VERY IMPORTANT – BODY LIMIT
+app.use(express.json({ limit: "100mb" }));
+app.use(express.urlencoded({ limit: "100mb", extended: true }));
+
+// agar body-parser use ho raha hai to
+const bodyParser = require("body-parser");
+app.use(bodyParser.json({ limit: "100mb" }));
+app.use(bodyParser.urlencoded({ limit: "100mb", extended: true }));
+
 // Auth Routes
 const authRoutes = require('./routes/authRoutes');
 app.use('/api/auth', authRoutes);
+
+
+// Student Dashboard Routes
+const studentRoutes = require('./routes/studentRoutes');
+app.use('/api/student', studentRoutes);
+
+// Static files serve (Digital Library, Notes, Books, Images)
+app.use('/files', express.static('/mnt/data'));
 
 // Teacher Dashboard Routes
 const teacherDashboardRoutes = require('./routes/teacherRoutes');
